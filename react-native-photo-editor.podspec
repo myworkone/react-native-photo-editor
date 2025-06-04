@@ -19,14 +19,25 @@ Pod::Spec.new do |s|
   s.dependency "React-Core"
   s.dependency "SDWebImage", "~> 5.11.1"
   s.dependency 'SDWebImageWebPCoder', '~> 0.8.4'
+  s.dependency 'ZLImageEditor'
 
-  s.subspec 'ZLImageEditor' do |zl|
-    zl.name             = "ZLImageEditor"
-    zl.source_files     = "ios/ZLImageEditor/Sources/*.{h,m,mm,swift}"
-    zl.exclude_files    = "ios/ZLImageEditor/Sources/ZLImageEditor.h"
-    zl.resources        = "ios/ZLImageEditor/Sources/*.{png,bundle}"
-    zl.requires_arc     = true
-    zl.frameworks       = "UIKit", "Accelerate"
-  end
+ # --- THIS IS THE MAJOR CHANGE ---
+  # Remove the entire subspec 'ZLImageEditor' block
+  # And add a direct dependency to your ZLImageEditor fork:
+
+  # Option 1: Depend on the main/master branch of your ZLImageEditor fork
+  # s.dependency 'ZLImageEditor', :git => 'https://github.com/myworkone/ZLImageEditor.git'
+
+  # Option 2: Depend on a specific tag from your ZLImageEditor fork (RECOMMENDED for stability)
+  # Ensure you have created this tag in your myworkone/ZLImageEditor repository.
+  # s.dependency 'ZLImageEditor', :git => 'https://github.com/myworkone/ZLImageEditor.git', :tag => 'v2.0.1-myfork' # Example tag
+
+  # Option 3: Depend on a specific branch from your ZLImageEditor fork
+  # s.dependency 'ZLImageEditor', :git => 'https://github.com/myworkone/ZLImageEditor.git', :branch => 'AF-3384-photo-editor-ios'
+  # --- END OF MAJOR CHANGE ---
+
+  # The frameworks and resources previously in the subspec (UIKit, Accelerate, bundles, pngs)
+  # should now be defined within the .podspec of your myworkone/ZLImageEditor fork itself.
+  # ZLImageEditor's own podspec will handle its resources and framework dependencies.
   
 end
