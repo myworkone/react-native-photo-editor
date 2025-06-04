@@ -10,6 +10,8 @@ target 'PhotoEditorExample' do
   use_react_native!(:path => config["reactNativePath"])
 
   pod 'react-native-photo-editor', :path => '../..'
+  # change the dependency below in case another branch is used
+  pod 'ZLImageEditor', :git => 'https://github.com/myworkone/ZLImageEditor.git', :branch => 'AF-3384/photo-editor-changes-ios'
 
   # Enables Flipper.
   #
