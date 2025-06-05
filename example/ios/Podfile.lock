@@ -397,7 +397,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   ZLImageEditor:
-    :commit: b24c0c911d0ff4fe6dc9ed52ea6a40b924fd4fbf
+    :commit: d0306348f533b085fd6c0457143d3bf40f699d67
     :git: https://github.com/myworkone/ZLImageEditor.git
 
 SPEC CHECKSUMS:
@@ -439,6 +439,6 @@ SPEC CHECKSUMS:
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
   ZLImageEditor: 303fd483584c3a2a0eed0d8f7cad72db2dcd04a3
 
-PODFILE CHECKSUM: b5fbf1859d0ef6fcb06f23fbff1e508e652b3024
+PODFILE CHECKSUM: 37d73ec0acd7b2ee772e1bf97ef9f29fcd8076f2
 
 COCOAPODS: 1.16.2

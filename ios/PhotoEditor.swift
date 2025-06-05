@@ -55,6 +55,10 @@ class PhotoEditor: NSObject {
         // Stickers
         let stickers = options["stickers"] as? [String] ?? []
         ZLImageEditorConfiguration.default().imageStickerContainerView = StickerView(stickers: stickers)
+        ZLImageEditorConfiguration.default().clipRatios(ZLImageClipRatio.all)
+        ZLImageEditorConfiguration.default().tools.removeAll { $0 == .filter }
+        ZLImageEditorConfiguration.default().tools.removeAll { $0 == .mosaic }
+        ZLImageEditorConfiguration.default().tools.removeAll { $0 == .adjust }
         
         
         // //Config
