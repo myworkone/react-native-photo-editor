@@ -54,25 +54,10 @@ class PhotoEditor: NSObject {
         
         // Stickers
         let stickers = options["stickers"] as? [String] ?? []
-        ZLImageEditorConfiguration.default().imageStickerContainerView = StickerView(stickers: stickers)
-        ZLImageEditorConfiguration.default().clipRatios(ZLImageClipRatio.all)
-        ZLImageEditorConfiguration.default().tools.removeAll { $0 == .filter }
-        ZLImageEditorConfiguration.default().tools.removeAll { $0 == .mosaic }
-        ZLImageEditorConfiguration.default().tools.removeAll { $0 == .adjust }
+        // ZLImageEditorConfiguration.default().imageStickerContainerView = StickerView(stickers: stickers)
+        ZLImageEditorConfiguration.default().shapeStickerContainerView = ShapeStickerContainerView()
+        ZLImageEditorConfiguration.default().tools = [.draw, .clip, .shapeSticker, .textSticker]
         
-        
-        // //Config
-        // ZLImageEditorConfiguration.default().editDoneBtnBgColor = UIColor(red:255/255.0, green:238/255.0, blue:101/255.0, alpha:1.0)
-
-        // ZLImageEditorConfiguration.default().editImageTools = [.draw, .clip, .filter, .imageSticker, .textSticker]
-        
-        //Filters Lut
-        // do {
-        //     let filters = ColorCubeLoader()
-        //     ZLImageEditorConfiguration.default().filters = try filters.load()
-        // } catch {
-        //     assertionFailure("\(error)")
-        // }
     }
     
   private func presentController(image: UIImage) {
