@@ -9,7 +9,7 @@ import ZLImageEditor
 
 class ShapeStickerContainerView: UIView, ZLShapeStickerContainerDelegate {
     
-    static let baseViewH: CGFloat = 400
+    static let baseViewH: CGFloat = 140
     
     var baseView: UIView!
     var collectionView: UICollectionView!
@@ -61,7 +61,7 @@ class ShapeStickerContainerView: UIView, ZLShapeStickerContainerDelegate {
         self.baseView.addSubview(toolView)
         toolView.snp.makeConstraints { (make) in
             make.top.left.right.equalTo(self.baseView)
-            make.height.equalTo(50)
+            make.height.equalTo(0)
         }
         
         let hideBtn = UIButton(type: .custom)
@@ -79,10 +79,10 @@ class ShapeStickerContainerView: UIView, ZLShapeStickerContainerDelegate {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-        layout.minimumLineSpacing = 5
-        layout.minimumInteritemSpacing = 5
+        layout.minimumLineSpacing = 10
+        layout.minimumInteritemSpacing = 10
         self.collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        self.collectionView.backgroundColor = .clear
+        self.collectionView.backgroundColor = .black
         self.collectionView.delegate = self
         self.collectionView.dataSource = self
         self.baseView.addSubview(self.collectionView)
@@ -146,9 +146,9 @@ extension ShapeStickerContainerView: UICollectionViewDataSource, UICollectionVie
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let column: CGFloat = 4
-        let spacing: CGFloat = 20 + 5 * (column - 1)
+        let spacing: CGFloat = 20 + 10 * (column - 1)
         let w = (collectionView.frame.width - spacing) / column
-        return CGSize(width: w, height: w)
+        return CGSize(width: w, height: w) 
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -183,7 +183,7 @@ class ShapeStickerCell: UICollectionViewCell {
         self.imageView.contentMode = .scaleAspectFit
         self.contentView.addSubview(self.imageView)
         self.imageView.snp.makeConstraints { (make) in
-            make.edges.equalTo(self.contentView)
+            make.edges.equalTo(self.contentView).inset(8)
         }
     }
     
@@ -192,7 +192,6 @@ class ShapeStickerCell: UICollectionViewCell {
     }
 }
 
-// Add this helper extension if it's not already visible in this file's scope
 // (It's better to have it in a shared utility file or with ZLShapeStickerView).
 private extension UIImage {
     func zl_tinted(with color: UIColor) -> UIImage {

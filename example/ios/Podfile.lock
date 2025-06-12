@@ -397,7 +397,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   ZLImageEditor:
-    :commit: 2417f889d943b0bde1c0ac865f7a660e17537587
+    :commit: 447dc7c429ff750a84ad0eb7930c4a7a9df9c4a7
     :git: https://github.com/myworkone/ZLImageEditor.git
 
 SPEC CHECKSUMS:
