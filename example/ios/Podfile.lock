@@ -197,9 +197,6 @@ PODS:
     - React-cxxreact (= 0.63.4)
     - React-jsi (= 0.63.4)
   - React-jsinspector (0.63.4)
-  - react-native-multiple-image-picker (0.4.6):
-    - React-Core
-    - TLPhotoPicker (= 2.1.4)
   - react-native-photo-editor (1.1.5):
     - React-Core
     - SDWebImage (~> 5.11.1)
@@ -278,7 +275,6 @@ PODS:
   - SDWebImageWebPCoder (0.8.5):
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.10)
-  - TLPhotoPicker (2.1.4)
   - Yoga (1.14.0)
   - ZLImageEditor (2.0.4):
     - ZLImageEditor/Core (= 2.0.4)
@@ -302,7 +298,6 @@ DEPENDENCIES:
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
-  - "react-native-multiple-image-picker (from `../node_modules/@baronha/react-native-multiple-image-picker`)"
   - react-native-photo-editor (from `../..`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -326,7 +321,6 @@ SPEC REPOS:
     - libwebp
     - SDWebImage
     - SDWebImageWebPCoder
-    - TLPhotoPicker
 
 EXTERNAL SOURCES:
   DoubleConversion:
@@ -359,8 +353,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsiexecutor"
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
-  react-native-multiple-image-picker:
-    :path: "../node_modules/@baronha/react-native-multiple-image-picker"
   react-native-photo-editor:
     :path: "../.."
   react-native-safe-area-context:
@@ -418,7 +410,6 @@ SPEC CHECKSUMS:
   React-jsi: df7455c330f8c1548225004fcc40031d4a7ade47
   React-jsiexecutor: f42871dfefc3a3ed2a0e62932f750e09b7ae6e19
   React-jsinspector: 58aef7155bc9a9683f5b60b35eccea8722a4f53a
-  react-native-multiple-image-picker: e0a58f7563a917bd72097dff626298d3f50fa554
   react-native-photo-editor: 443521c07dae37711c22ea300a56e48b9902caa8
   react-native-safe-area-context: 1c298d1cee1e333d3f44ea6dc8dfca086bd06242
   React-RCTActionSheet: 89a0ca9f4a06c1f93c26067af074ccdce0f40336
@@ -435,7 +426,6 @@ SPEC CHECKSUMS:
   RNSVG: c1c40be8be96ff056ced81c302d356f1c490c8a0
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
-  TLPhotoPicker: f486e8499e1c3f464d0e886697635e25a72a52b8
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
   ZLImageEditor: 303fd483584c3a2a0eed0d8f7cad72db2dcd04a3
 

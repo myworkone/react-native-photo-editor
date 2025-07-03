@@ -645,11 +645,6 @@
     "@babel/helper-validator-identifier" "^7.14.9"
     to-fast-properties "^2.0.0"
 
-"@baronha/react-native-multiple-image-picker@^0.4.6":
-  version "0.4.6"
-  resolved "https://registry.npmjs.org/@baronha/react-native-multiple-image-picker/-/react-native-multiple-image-picker-0.4.6.tgz"
-  integrity sha512-Q//YK+li3Y5e2A6XeacPIWcOfu14Xs40Hm3SzmU42UxXbK2LYd2mK6B5zr9sMcFkqkFyNYulkcgy5vtxTZ297A==
-
 "@cnakazawa/watch@^1.0.3":
   version "1.0.4"
   resolved "https://registry.npmjs.org/@cnakazawa/watch/-/watch-1.0.4.tgz"
