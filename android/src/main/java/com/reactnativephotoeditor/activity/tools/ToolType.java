@@ -6,9 +6,11 @@ package com.reactnativephotoeditor.activity.tools;
  * @since 5/23/2018
  */
 public enum ToolType {
+  CROP,
+  BRUSH,
   SHAPE,
   ERASER,
   FILTER,
   TEXT,
-  STICKER
+  STICKER,
 }

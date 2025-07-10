@@ -2,7 +2,7 @@
   xmlns:tools="http://schemas.android.com/tools"
   package="com.reactnativephotoeditor">
 
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.INTERNET" />
   <application
     android:allowBackup="false"
@@ -11,6 +11,13 @@
     >
     <activity
       android:name=".activity.PhotoEditorActivity"
+      android:exported="true"
       android:configChanges="orientation|keyboardHidden|screenSize" />
+    <activity
+        android:name="com.canhub.cropper.CropImageActivity"
+        android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
+    <activity
+      android:name=".activity.CropperActivity"
+      android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
   </application>
 </manifest>

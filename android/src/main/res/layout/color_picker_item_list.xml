@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="36dp"
+    android:layout_height="36dp"
+    android:layout_margin="2dp">
 
+    <!-- This is the colored circle -->
     <View
         android:id="@+id/color_picker_view"
-        android:layout_width="40dp"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true"
-        android:background="@android:color/white"
-        tools:text="" />
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center"
+        android:background="@drawable/color_circle_drawable" />
 
-</RelativeLayout>
+    <!-- This is the selection indicator (white border) -->
+    <View
+        android:id="@+id/color_picker_selected"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:background="@drawable/color_picker_selected_border"
+        android:visibility="gone" />
+
+</FrameLayout>
