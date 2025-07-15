@@ -8,17 +8,12 @@
     android:background="@color/tool_bg"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <!-- This Guideline reserves space at the top for our action bar -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/top_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="?attr/actionBarSize" />
-
-    <!-- ====================================================================== -->
-    <!-- START: TOP BAR                                                         -->
-    <!-- ====================================================================== -->
 
     <TextView
         android:id="@+id/btnCancel"
@@ -33,6 +28,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- MODIFIED: Centered the title between the Undo and Done buttons -->
     <TextView
         android:id="@+id/txtTitle"
         android:layout_width="wrap_content"
@@ -43,8 +39,9 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/top_guideline"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnDone"
+        app:layout_constraintStart_toEndOf="@+id/imgUndo"
+        app:layout_constraintHorizontal_bias="0.3" 
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -61,6 +58,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- MODIFIED: Added margin for spacing -->
     <ImageView
         android:id="@+id/imgUndo"
         android:layout_width="wrap_content"
@@ -68,14 +66,11 @@
         android:paddingHorizontal="10dp"
         android:src="@drawable/ic_undo"
         app:tint="@android:color/white"
+        android:layout_marginStart="16dp"
         app:layout_constraintBottom_toTopOf="@+id/top_guideline"
         app:layout_constraintStart_toEndOf="@+id/btnCancel"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription" />
-
-    <!-- ====================================================================== -->
-    <!-- END: TOP BAR                                                           -->
-    <!-- ====================================================================== -->
 
     <ja.burhanrashid52.photoeditor.PhotoEditorView
         android:id="@+id/photoEditorView"
@@ -95,25 +90,51 @@
         android:orientation="horizontal"
         android:visibility="gone"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@+id/rvConstraintTools"
+        app:layout_constraintBottom_toTopOf="@+id/tools_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:listitem="@layout/color_picker_item_list"
         tools:visibility="visible" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvConstraintTools"
+    <!-- MODIFIED: Constrained the tools container to the FAB -->
+    <FrameLayout
+        android:id="@+id/tools_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/tool_bg"
-        android:orientation="horizontal"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="9dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:listitem="@layout/row_editing_tools" />
+        app:layout_constraintEnd_toStartOf="@+id/fabMoreOptions">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvConstraintTools"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/tool_bg"
+            android:orientation="horizontal"
+            android:paddingVertical="4dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/row_editing_tools" />
+
+        <FrameLayout
+            android:id="@+id/shape_picker_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/tool_bg"
+            android:visibility="gone">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvShapes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/row_shape_picker_item" />
+        </FrameLayout>
+
+    </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvFilterView"
@@ -122,26 +143,70 @@
         android:background="@color/tool_bg"
         android:orientation="horizontal"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="@+id/rvConstraintTools"
+        app:layout_constraintBottom_toBottomOf="@+id/tools_container"
         app:layout_constraintStart_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/rvConstraintTools"
+        app:layout_constraintTop_toTopOf="@+id/tools_container"
         tools:listitem="@layout/row_filter_view" />
 
-    <!-- ====================================================================== -->
-    <!-- START: FLOATING ACTION BUTTON                                          -->
-    <!-- ====================================================================== -->
+    <EditText
+    android:id="@+id/inlineEditText"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="8dp"
+    android:background="@android:color/transparent"
+    android:gravity="center"
+    android:imeOptions="actionDone"
+    android:inputType="text"
+    android:padding="8dp"
+    android:visibility="gone"
+    app:layout_constraintBottom_toTopOf="@+id/rvColorPicker"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    tools:text="Sample Text"
+    tools:textColor="@android:color/white"
+    tools:textSize="24sp"
+    tools:visibility="visible" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_more_options"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:contentDescription="More Options"
-        app:backgroundTint="#FFC107"
+    <FrameLayout
+        android:id="@+id/fabMoreOptions"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_margin="16dp"
+        android:contentDescription="More options"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_more_horiz_24"
-        app:tint="@color/white" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- ... (FAB content remains the same) ... -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/fab_background_ios" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/fab_dot_ios" />
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/fab_dot_ios" />
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/fab_dot_ios" />
+        </LinearLayout>
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

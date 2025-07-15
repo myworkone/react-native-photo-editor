@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <!-- Corresponds to UIColor(red: 189/255, green: 189/255, blue: 189/255) -->
+    <solid android:color="#BDBDBD" />
+</shape>

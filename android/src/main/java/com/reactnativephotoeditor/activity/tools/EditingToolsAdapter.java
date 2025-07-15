@@ -1,14 +1,11 @@
 package com.reactnativephotoeditor.activity.tools;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.reactnativephotoeditor.R;
@@ -18,8 +15,8 @@ import java.util.List;
 
 public class EditingToolsAdapter extends RecyclerView.Adapter<EditingToolsAdapter.ViewHolder> {
 
-    private List<ToolModel> mToolList = new ArrayList<>();
-    private OnItemSelected mOnItemSelected;
+    private final List<ToolModel> mToolList = new ArrayList<>();
+    private final OnItemSelected mOnItemSelected;
     private ToolType mSelectedToolType;
 
     public EditingToolsAdapter(OnItemSelected onItemSelected) {
@@ -36,14 +33,22 @@ public class EditingToolsAdapter extends RecyclerView.Adapter<EditingToolsAdapte
         notifyDataSetChanged();
     }
 
+    /**
+     * Clears the selection of any tool.
+     */
+    public void clearSelection() {
+        mSelectedToolType = null;
+        notifyDataSetChanged();
+    }
+
     public interface OnItemSelected {
         void onToolSelected(ToolType toolType);
     }
 
-    class ToolModel {
-        private String mToolName;
-        private int mToolIcon;
-        private ToolType mToolType;
+    static class ToolModel {
+        private final String mToolName;
+        private final int mToolIcon;
+        private final ToolType mToolType;
 
         ToolModel(String toolName, int toolIcon, ToolType toolType) {
             mToolName = toolName;
