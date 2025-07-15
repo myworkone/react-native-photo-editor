@@ -508,7 +508,6 @@ override fun onEditTextChangeListener(rootView: View, text: String, colorCode: I
     cropImageLauncher.launch(
       options(uri = tempUri) {
         setGuidelines(CropImageView.Guidelines.ON)
-        setActivityTitle("Crop Image")
         setFixAspectRatio(false)
         setBackgroundColor(Color.parseColor("#B3000000"))
       }
