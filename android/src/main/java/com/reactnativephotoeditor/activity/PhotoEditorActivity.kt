@@ -103,6 +103,7 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
   private var mIsAddingShape: Boolean = false
   private var mIsBrushMode: Boolean = false
   private var mIsShapeToolSelected: Boolean = false
+  private var mLastTappedTextView: View? = null
 
   // Views and state for inline text editing
   private var mInlineEditText: EditText? = null
@@ -213,20 +214,21 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
     mPhotoEditor?.setOnPhotoEditorListener(this)
 
     mPhotoEditorView?.setOnClickListener {
-      if (mEditingTextView != null) {
+    mLastTappedTextView = null // <-- ADD THIS LINE
+    if (mEditingTextView != null) {
         commitInlineTextEdit()
-      } else if (mIsShapePickerVisible) {
+    } else if (mIsShapePickerVisible) {
         closeShapePickerAndDeselectTool()
-      } else if (mCurrentShapeView != null) {
+    } else if (mCurrentShapeView != null) {
         mPhotoEditor?.clearHelperBox()
         mCurrentShapeView = null
         updateColorPickerVisibility()
-      } else if (mCurrentTextView != null) {
+    } else if (mCurrentTextView != null) {
         mPhotoEditor?.clearHelperBox()
         mCurrentTextView = null
         updateColorPickerVisibility()
-      }
     }
+}
 
     Glide
       .with(this)
@@ -281,24 +283,25 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
     updateColorPickerVisibility()
   }
 
-  override fun onStartViewChangeListener(viewType: ViewType) {
+override fun onStartViewChangeListener(viewType: ViewType) {
     if (mIsBrushMode || mEditingTextView != null) {
-      return
+        return
     }
 
     val topView = mPhotoEditorView?.getChildAt(mPhotoEditorView!!.childCount - 1)
     if (viewType == ViewType.IMAGE) {
-      mCurrentShapeView = topView
-      mCurrentTextView = null
+        mCurrentShapeView = topView
+        mCurrentTextView = null
+        mLastTappedTextView = null // <-- ADD THIS LINE
     } else if (viewType == ViewType.TEXT) {
-      mCurrentTextView = topView
-      mCurrentShapeView = null
+        mCurrentTextView = topView
+        mCurrentShapeView = null
     } else {
-      mCurrentShapeView = null
-      mCurrentTextView = null
+        mCurrentShapeView = null
+        mCurrentTextView = null
     }
     updateColorPickerVisibility()
-  }
+}
 
   override fun onToolSelected(toolType: ToolType) {
     if (mEditingTextView != null) commitInlineTextEdit()
@@ -388,47 +391,50 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
   }
 
 override fun onEditTextChangeListener(rootView: View, text: String, colorCode: Int) {
-    // If we are already editing a text view, and the user taps a different one,
-    // commit the changes to the first one before starting to edit the new one.
-    if (mEditingTextView != null && mEditingTextView != rootView) {
-        commitInlineTextEdit()
-    }
-    // If the user taps the same text view that is already being edited, do nothing.
-    if (mEditingTextView == rootView) return
+    // If the view the user just interacted with is the same as the last one they tapped...
+    if (mLastTappedTextView == rootView) {
+        // ...then this is the SECOND tap. Let's start editing.
+        // First, reset the tracker for the next time.
+        mLastTappedTextView = null
 
-    mEditingTextView = rootView
-    mCurrentTextView = null // Deselect for UI purposes
-
-    // Hide the tools container when starting to edit text
-    mToolsContainer?.visibility = View.GONE
-    showFab(false) // MODIFIED: Animate FAB out
-
-    mEditingTextTranslationX = rootView.translationX
-    mEditingTextTranslationY = rootView.translationY
-
-    val txtSticker = rootView.findViewById<TextView>(ja.burhanrashid52.photoeditor.R.id.tvPhotoEditorText)
-    // Hide the original TextView. We will make it visible again when editing is finished.
-    txtSticker.visibility = View.INVISIBLE
-
-    mInlineEditText?.apply {
-        // Set content and style to match the sticker being edited
-        this.setText(text)
-        this.setTextColor(colorCode)
-        this.textSize = txtSticker.textSize / resources.displayMetrics.scaledDensity
-
-        // Make the EditText visible
-        this.visibility = View.VISIBLE
-
-        // Post the focus request and keyboard show to the view's message queue.
-        this.post {
-            this.requestFocus()
-            showKeyboard(this)
+        // --- Now, proceed with the original editing logic ---
+        if (mEditingTextView != null && mEditingTextView != rootView) {
+            commitInlineTextEdit()
         }
-    }
+        if (mEditingTextView == rootView) return
 
-    // Ensure the color picker is visible for the editing session
-    mRvColorPicker?.visibility = View.VISIBLE
-    mPhotoEditor?.setBrushDrawingMode(true) // Disable sticker interaction while editing text
+        mEditingTextView = rootView
+        mCurrentTextView = null
+
+        mToolsContainer?.visibility = View.GONE
+        showFab(false)
+
+        mEditingTextTranslationX = rootView.translationX
+        mEditingTextTranslationY = rootView.translationY
+
+        val txtSticker = rootView.findViewById<TextView>(ja.burhanrashid52.photoeditor.R.id.tvPhotoEditorText)
+        txtSticker.visibility = View.INVISIBLE
+
+        mInlineEditText?.apply {
+            this.setText(text)
+            this.setTextColor(colorCode)
+            this.textSize = txtSticker.textSize / resources.displayMetrics.scaledDensity
+            this.visibility = View.VISIBLE
+            this.post {
+                this.requestFocus()
+                showKeyboard(this)
+            }
+        }
+
+        mRvColorPicker?.visibility = View.VISIBLE
+        mPhotoEditor?.setBrushDrawingMode(true)
+
+    } else {
+        // --- This is the FIRST tap (or long press) ---
+        // The library has already selected the view. We just need to record
+        // that this view was the last one tapped and then do nothing else.
+        mLastTappedTextView = rootView
+    }
 }
 
   private fun commitInlineTextEdit() {
