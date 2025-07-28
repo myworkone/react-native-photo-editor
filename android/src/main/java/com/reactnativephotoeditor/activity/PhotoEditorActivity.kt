@@ -284,19 +284,35 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
   }
 
 override fun onStartViewChangeListener(viewType: ViewType) {
-    if (mIsBrushMode || mEditingTextView != null) {
+    if (mEditingTextView != null) {
         return
     }
 
+    //  We only exit brush mode if we are IN brush mode
+    // AND the user has explicitly tapped a sticker (Image or Text).
+    if (mIsBrushMode && (viewType == ViewType.IMAGE || viewType == ViewType.TEXT)) {
+        // The user was drawing, but has now selected a sticker.
+        // Exit brush mode to allow sticker editing.
+        mPhotoEditor?.setBrushDrawingMode(false)
+        mIsBrushMode = false
+        mEditingToolsAdapter.clearSelection()
+    }
+    // If the viewType is DRAWING, the above 'if' is false, and the code proceeds,
+    // allowing the drawing to happen because setBrushDrawingMode(true) is still active.
+
+    // The rest of the original logic can now run correctly.
     val topView = mPhotoEditorView?.getChildAt(mPhotoEditorView!!.childCount - 1)
     if (viewType == ViewType.IMAGE) {
         mCurrentShapeView = topView
         mCurrentTextView = null
-        mLastTappedTextView = null // <-- ADD THIS LINE
+        mLastTappedTextView = null
     } else if (viewType == ViewType.TEXT) {
         mCurrentTextView = topView
         mCurrentShapeView = null
     } else {
+        // This 'else' block will be entered when starting a drawing.
+        // We clear the sticker selections, but since mIsBrushMode is still true,
+        // the color picker will remain visible for the brush.
         mCurrentShapeView = null
         mCurrentTextView = null
     }

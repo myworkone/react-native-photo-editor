@@ -23,9 +23,10 @@ public class EditingToolsAdapter extends RecyclerView.Adapter<EditingToolsAdapte
         mOnItemSelected = onItemSelected;
 
         mToolList.add(new ToolModel("Brush", R.drawable.selector_ic_pencil, ToolType.BRUSH));
+        mToolList.add(new ToolModel("Crop", R.drawable.selector_ic_crop, ToolType.CROP));
         mToolList.add(new ToolModel("Shape", R.drawable.selector_ic_shape, ToolType.SHAPE));
         mToolList.add(new ToolModel("Text", R.drawable.selector_ic_text, ToolType.TEXT));
-        mToolList.add(new ToolModel("Crop", R.drawable.selector_ic_crop, ToolType.CROP));
+        
     }
 
     public void setSelectedTool(ToolType toolType) {

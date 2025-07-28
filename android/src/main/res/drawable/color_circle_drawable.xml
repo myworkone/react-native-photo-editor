@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <!-- The color will be set programmatically in the adapter -->
-    <solid android:color="@android:color/white" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The thin white border -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@android:color/white" />
+        </shape>
+    </item>
+    <!-- The inner color, inset by 1.5dp to reveal the border -->
+    <item
+        android:id="@+id/inner_color_shape"
+        android:top="1.5dp"
+        android:bottom="1.5dp"
+        android:left="1.5dp"
+        android:right="1.5dp">
+        <shape android:shape="oval">
+            <solid android:color="#CCCCCC" /> <!-- Placeholder color -->
+        </shape>
+    </item>
+</layer-list>

@@ -3,14 +3,13 @@ package com.reactnativephotoeditor.activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable; // --- IMPORT THIS ---
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.reactnativephotoeditor.R;
-
 import java.util.List;
 
 public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.ViewHolder> {
@@ -18,10 +17,7 @@ public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.
     private final List<Integer> colorPickerColors;
     private final LayoutInflater inflater;
     private OnColorPickerClickListener onColorPickerClickListener;
-
-    // --- NEW ---
-    // We need to keep track of the selected item's position
-    private int selectedPosition = 0; // Default to the first color being selected
+    private int selectedPosition = 0;
 
     public ColorPickerAdapter(@NonNull Context context, @NonNull List<Integer> colorPickerColors) {
         this.inflater = LayoutInflater.from(context);
@@ -29,14 +25,14 @@ public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.
     }
 
     public ColorPickerAdapter(@NonNull Context context) {
-        // We now use a new getDefaultColors() that matches the requested image
         this(context, getDefaultColors());
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Make sure this layout name matches the one we just created
+        // --- NOTE ---
+        // Your layout file name is correct here.
         View view = inflater.inflate(R.layout.color_picker_item_list, parent, false);
         return new ViewHolder(view);
     }
@@ -45,12 +41,18 @@ public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.
     public void onBindViewHolder(ViewHolder holder, int position) {
         int colorCode = colorPickerColors.get(position);
 
-        // --- UPDATED ---
-        // Get the drawable for the color circle and set its color
-        GradientDrawable colorCircle = (GradientDrawable) holder.colorPickerView.getBackground();
-        colorCircle.setColor(colorCode);
+        // --- UPDATED LOGIC ---
+        // 1. Get the background as a LayerDrawable and call mutate().
+        //    mutate() is important to ensure changes to this item don't affect other items.
+        LayerDrawable layerDrawable = (LayerDrawable) holder.colorPickerView.getBackground().mutate();
 
-        // Show or hide the selection border based on the selected position
+        // 2. Find the inner shape by its ID (the one we defined in color_circle_drawable.xml).
+        GradientDrawable innerColorShape = (GradientDrawable) layerDrawable.findDrawableByLayerId(R.id.inner_color_shape);
+
+        // 3. Set the color of that inner shape.
+        innerColorShape.setColor(colorCode);
+
+        // 4. Show or hide the selection border. This logic was already perfect.
         if (selectedPosition == position) {
             holder.selectionView.setVisibility(View.VISIBLE);
         } else {
@@ -63,31 +65,24 @@ public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.
         return colorPickerColors.size();
     }
 
-    // --- DELETED ---
-    // The complex buildColorPickerView method is no longer needed. We use XML drawables instead.
-
     public void setOnColorPickerClickListener(OnColorPickerClickListener onColorPickerClickListener) {
         this.onColorPickerClickListener = onColorPickerClickListener;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        // --- UPDATED ---
-        // We now need references to both the color view and the selection view
         View colorPickerView;
         View selectionView;
 
         public ViewHolder(View itemView) {
             super(itemView);
             colorPickerView = itemView.findViewById(R.id.color_picker_view);
-            selectionView = itemView.findViewById(R.id.color_picker_selected); // Get reference to selection border
-            
-            // --- UPDATED CLICK LISTENER ---
+            selectionView = itemView.findViewById(R.id.color_picker_selected);
+
+            // This click listener logic is excellent and needs no changes.
             itemView.setOnClickListener(v -> {
                 int previousPosition = selectedPosition;
                 selectedPosition = getAdapterPosition();
 
-                // Notify the adapter to re-render the old and new selected items.
-                // This is more efficient than notifyDataSetChanged().
                 notifyItemChanged(previousPosition);
                 notifyItemChanged(selectedPosition);
 
@@ -102,18 +97,18 @@ public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.
         void onColorPickerClickListener(int colorCode);
     }
 
-    // --- UPDATED ---
-    // This new list of colors matches the colors in your target image.
+    // This is fine and needs no changes.
     public static List<Integer> getDefaultColors() {
         return List.of(
                 Color.parseColor("#FFFFFF"),
                 Color.parseColor("#000000"),
-                Color.parseColor("#EF5350"), // Coral Red
-                Color.parseColor("#FFA726"), // Orange
-                Color.parseColor("#66BB6A"), // Green
-                Color.parseColor("#42A5F5"), // Blue
-                Color.parseColor("#AB47BC"), // Purple
-                Color.parseColor("#BDBDBD")  // Grey
+                Color.parseColor("#EF4444"), // Red
+                Color.parseColor("#F97316"), // Orange
+                Color.parseColor("#EAB308"), // Yellow
+                Color.parseColor("#22C55E"), // Green
+                Color.parseColor("#3B82F6"), // Blue
+                Color.parseColor("#8B5CF6"), // Purple
+                Color.parseColor("#EC4899")  // Pink
         );
     }
 }
