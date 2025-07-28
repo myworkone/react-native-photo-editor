@@ -336,6 +336,7 @@ override fun onStartViewChangeListener(viewType: ViewType) {
       ToolType.TEXT -> {
         val styleBuilder = TextStyleBuilder()
         styleBuilder.withTextColor(Color.WHITE)
+        styleBuilder.withTextSize(40f)
         mPhotoEditor!!.addText("text", styleBuilder)
       }
       ToolType.ERASER -> mPhotoEditor!!.brushEraser()
