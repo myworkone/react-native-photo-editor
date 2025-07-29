@@ -66,7 +66,6 @@ import ja.burhanrashid52.photoeditor.*
 import java.io.File
 import java.io.FileOutputStream
 
-
 open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, View.OnClickListener,
   PropertiesBSFragment.Properties, StickerListener,
   OnItemSelected, FilterListener, ShapePickerFragment.OnShapePickedListener {
@@ -88,12 +87,19 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
   private var mIsShapePickerVisible = false
   private var mRvColorPicker: RecyclerView? = null
   private var mColorPickerAdapter: ColorPickerAdapter? = null
+  private var mImgUndo: ImageView? = null
+
+  // Self-managed state for the undo button
+  private var changesCounter = 0
+  private var isUndoing = false
 
   private val cropImageLauncher = registerForActivityResult(CropImageContract()) { result ->
     if (result.isSuccessful) {
       val croppedUri = result.uriContent
       mPhotoEditor?.clearAllViews()
+      changesCounter = 0
       mPhotoEditorView?.source?.setImageURI(croppedUri)
+      updateUndoButtonState()
     }
   }
 
@@ -107,7 +113,7 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
 
   // Views and state for inline text editing
   private var mInlineEditText: EditText? = null
-  private var mEditingTextView: View? = null // The sticker root view being edited
+  private var mEditingTextView: View? = null
   private var mEditingTextTranslationX: Float = 0f
   private var mEditingTextTranslationY: Float = 0f
 
@@ -116,33 +122,37 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
     mRvColorPicker?.visibility = if (shouldBeVisible) View.VISIBLE else View.GONE
   }
 
+  private fun updateUndoButtonState() {
+    if (changesCounter > 0) {
+        mImgUndo?.isEnabled = true
+        mImgUndo?.alpha = 1.0f
+    } else {
+        mImgUndo?.isEnabled = false
+        mImgUndo?.alpha = 0.5f
+    }
+  }
+
   @SuppressLint("ClickableViewAccessibility")
   @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
   override fun onCreate(savedInstanceState: Bundle?) {
-    // Override the enter transition
     overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     super.onCreate(savedInstanceState)
     makeFullScreen()
     setContentView(R.layout.photo_editor_view)
     initViews()
 
-    // --- ADD THE FAB ANIMATION HERE ---
     mFabMoreOptions = findViewById(R.id.fabMoreOptions)
-    // 1. Set the initial state (off-screen top and invisible)
-    mFabMoreOptions?.translationY = -250f // Start above the screen
+    mFabMoreOptions?.translationY = -250f
     mFabMoreOptions?.alpha = 0f
 
-    // 2. Animate it to its final position with a spring effect
     mFabMoreOptions?.animate()
-      ?.translationY(0f) // Move to its final Y position
-      ?.alpha(1f) // Fade it in
-      ?.setInterpolator(OvershootInterpolator(1.0f)) // This creates the springy/bouncy effect
-      ?.setStartDelay(100) // 100ms delay, matching the iOS code (0.1s)
-      ?.setDuration(800) // 800ms duration, matching the iOS code (0.8s)
+      ?.translationY(0f)
+      ?.alpha(1f)
+      ?.setInterpolator(OvershootInterpolator(1.0f))
+      ?.setStartDelay(100)
+      ?.setDuration(800)
       ?.start()
-    // --- END OF ANIMATION CODE ---
 
-    // Setup for inline editing listener on the keyboard's "Done" action
     mInlineEditText?.setOnEditorActionListener { _, actionId, _ ->
       if (actionId == EditorInfo.IME_ACTION_DONE) {
         commitInlineTextEdit()
@@ -154,7 +164,6 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
     mColorPickerAdapter = ColorPickerAdapter(this)
     mColorPickerAdapter?.setOnColorPickerClickListener { colorCode ->
       if (mEditingTextView != null) {
-        // If we are actively editing text, apply the color to the live EditText
         mInlineEditText?.setTextColor(colorCode)
       } else if (mCurrentShapeView != null) {
         val shapeImageView = mCurrentShapeView?.findViewById<ImageView>(ja.burhanrashid52.photoeditor.R.id.imgPhotoEditorImage)
@@ -212,23 +221,24 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
       .setPinchTextScalable(pinchTextScalable)
       .build()
     mPhotoEditor?.setOnPhotoEditorListener(this)
+    updateUndoButtonState()
 
     mPhotoEditorView?.setOnClickListener {
-    mLastTappedTextView = null // <-- ADD THIS LINE
-    if (mEditingTextView != null) {
-        commitInlineTextEdit()
-    } else if (mIsShapePickerVisible) {
-        closeShapePickerAndDeselectTool()
-    } else if (mCurrentShapeView != null) {
-        mPhotoEditor?.clearHelperBox()
-        mCurrentShapeView = null
-        updateColorPickerVisibility()
-    } else if (mCurrentTextView != null) {
-        mPhotoEditor?.clearHelperBox()
-        mCurrentTextView = null
-        updateColorPickerVisibility()
+      mLastTappedTextView = null
+      if (mEditingTextView != null) {
+          commitInlineTextEdit()
+      } else if (mIsShapePickerVisible) {
+          closeShapePickerAndDeselectTool()
+      } else if (mCurrentShapeView != null) {
+          mPhotoEditor?.clearHelperBox()
+          mCurrentShapeView = null
+          updateColorPickerVisibility()
+      } else if (mCurrentTextView != null) {
+          mPhotoEditor?.clearHelperBox()
+          mCurrentTextView = null
+          updateColorPickerVisibility()
+      }
     }
-}
 
     Glide
       .with(this)
@@ -267,7 +277,16 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
     mPhotoEditor?.addImage(vectorToBitmap(shapeSticker))
   }
 
+  // CORE FIX #1: This listener ONLY increments for static additions (Text and Image/Sticker).
   override fun onAddViewListener(viewType: ViewType, numberOfAddedViews: Int) {
+    if (!isUndoing) {
+        // We only count this as a change if it's NOT a drawing.
+        // Drawings will be counted by onStopViewChangeListener.
+        if (viewType == ViewType.IMAGE || viewType == ViewType.TEXT) {
+            changesCounter++
+        }
+    }
+
     mPhotoEditor?.clearHelperBox()
     mCurrentShapeView = null
     mCurrentTextView = null
@@ -281,26 +300,18 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
       mCurrentTextView = mPhotoEditorView?.getChildAt(mPhotoEditorView!!.childCount - 1)
     }
     updateColorPickerVisibility()
+    updateUndoButtonState()
   }
 
-override fun onStartViewChangeListener(viewType: ViewType) {
+  override fun onStartViewChangeListener(viewType: ViewType) {
     if (mEditingTextView != null) {
         return
     }
-
-    //  We only exit brush mode if we are IN brush mode
-    // AND the user has explicitly tapped a sticker (Image or Text).
     if (mIsBrushMode && (viewType == ViewType.IMAGE || viewType == ViewType.TEXT)) {
-        // The user was drawing, but has now selected a sticker.
-        // Exit brush mode to allow sticker editing.
         mPhotoEditor?.setBrushDrawingMode(false)
         mIsBrushMode = false
         mEditingToolsAdapter.clearSelection()
     }
-    // If the viewType is DRAWING, the above 'if' is false, and the code proceeds,
-    // allowing the drawing to happen because setBrushDrawingMode(true) is still active.
-
-    // The rest of the original logic can now run correctly.
     val topView = mPhotoEditorView?.getChildAt(mPhotoEditorView!!.childCount - 1)
     if (viewType == ViewType.IMAGE) {
         mCurrentShapeView = topView
@@ -310,14 +321,11 @@ override fun onStartViewChangeListener(viewType: ViewType) {
         mCurrentTextView = topView
         mCurrentShapeView = null
     } else {
-        // This 'else' block will be entered when starting a drawing.
-        // We clear the sticker selections, but since mIsBrushMode is still true,
-        // the color picker will remain visible for the brush.
         mCurrentShapeView = null
         mCurrentTextView = null
     }
     updateColorPickerVisibility()
-}
+  }
 
   override fun onToolSelected(toolType: ToolType) {
     if (mEditingTextView != null) commitInlineTextEdit()
@@ -342,7 +350,7 @@ override fun onStartViewChangeListener(viewType: ViewType) {
       ToolType.ERASER -> mPhotoEditor!!.brushEraser()
       ToolType.FILTER -> showFilter(true)
       ToolType.STICKER -> showBottomSheetDialogFragment(mStickerFragment)
-      else -> { /* Do nothing for Brush as it's handled by mIsBrushMode */ }
+      else -> { /* Do nothing */ }
     }
     updateColorPickerVisibility()
   }
@@ -388,13 +396,13 @@ override fun onStartViewChangeListener(viewType: ViewType) {
   }
 
   private fun initViews() {
-    val imgUndo: ImageView = findViewById(R.id.imgUndo)
-    imgUndo.setOnClickListener(this)
+    mImgUndo = findViewById(R.id.imgUndo)
+    mImgUndo?.setOnClickListener(this)
     val btnCancel: TextView = findViewById(R.id.btnCancel)
     btnCancel.setOnClickListener(this)
     val btnDone: TextView = findViewById(R.id.btnDone)
     btnDone.setOnClickListener(this)
-    
+
     mPhotoEditorView = findViewById(R.id.photoEditorView)
     mRvTools = findViewById(R.id.rvConstraintTools)
     mRvFilters = findViewById(R.id.rvFilterView)
@@ -402,19 +410,12 @@ override fun onStartViewChangeListener(viewType: ViewType) {
     mShapePickerContainer = findViewById(R.id.shape_picker_container)
     mRootView = findViewById(R.id.rootView)
     mRvColorPicker = findViewById(R.id.rvColorPicker)
-
-    // Initialize inline editing view
     mInlineEditText = findViewById(R.id.inlineEditText)
   }
 
-override fun onEditTextChangeListener(rootView: View, text: String, colorCode: Int) {
-    // If the view the user just interacted with is the same as the last one they tapped...
+  override fun onEditTextChangeListener(rootView: View, text: String, colorCode: Int) {
     if (mLastTappedTextView == rootView) {
-        // ...then this is the SECOND tap. Let's start editing.
-        // First, reset the tracker for the next time.
         mLastTappedTextView = null
-
-        // --- Now, proceed with the original editing logic ---
         if (mEditingTextView != null && mEditingTextView != rootView) {
             commitInlineTextEdit()
         }
@@ -442,17 +443,12 @@ override fun onEditTextChangeListener(rootView: View, text: String, colorCode: I
                 showKeyboard(this)
             }
         }
-
         mRvColorPicker?.visibility = View.VISIBLE
         mPhotoEditor?.setBrushDrawingMode(true)
-
     } else {
-        // --- This is the FIRST tap (or long press) ---
-        // The library has already selected the view. We just need to record
-        // that this view was the last one tapped and then do nothing else.
         mLastTappedTextView = rootView
     }
-}
+  }
 
   private fun commitInlineTextEdit() {
     val newText = mInlineEditText?.text.toString().trim()
@@ -471,14 +467,13 @@ override fun onEditTextChangeListener(rootView: View, text: String, colorCode: I
 
     hideKeyboard(mInlineEditText!!)
     mInlineEditText?.visibility = View.GONE
-    mRvColorPicker?.visibility = View.GONE // Hide color picker after editing
+    mRvColorPicker?.visibility = View.GONE
 
-    // Show the tools container again
     mToolsContainer?.visibility = View.VISIBLE
-    showFab(true) // MODIFIED: Animate FAB in
+    showFab(true)
 
     mEditingTextView = null
-    mPhotoEditor?.setBrushDrawingMode(false) // Re-enable sticker interaction
+    mPhotoEditor?.setBrushDrawingMode(false)
     mPhotoEditor?.clearHelperBox()
   }
 
@@ -492,8 +487,17 @@ override fun onEditTextChangeListener(rootView: View, text: String, colorCode: I
     imm.hideSoftInputFromWindow(view.windowToken, 0)
   }
 
-  override fun onRemoveViewListener(viewType: ViewType, numberOfAddedViews: Int) {}
-  override fun onStopViewChangeListener(viewType: ViewType) {}
+  override fun onRemoveViewListener(viewType: ViewType, numberOfAddedViews: Int) {
+      // Do nothing. This is handled by the undo click.
+  }
+
+  // CORE FIX #2: This listener handles modifications and drawings.
+  override fun onStopViewChangeListener(viewType: ViewType) {
+    if (!isUndoing) {
+      changesCounter++
+    }
+    updateUndoButtonState()
+  }
 
   @SuppressLint("MissingPermission")
   private fun launchCrop() {
@@ -537,10 +541,19 @@ override fun onEditTextChangeListener(rootView: View, text: String, colorCode: I
     )
   }
 
+  // CORE FIX #3: This is now the definitive handler for undoing.
   @SuppressLint("NonConstantResourceId")
   override fun onClick(view: View) {
     when (view.id) {
-      R.id.imgUndo -> mPhotoEditor!!.undo()
+      R.id.imgUndo -> {
+          if (changesCounter > 0) {
+              isUndoing = true
+              mPhotoEditor?.undo()
+              changesCounter--
+              isUndoing = false
+          }
+          updateUndoButtonState()
+      }
       R.id.btnDone -> saveImage()
       R.id.btnCancel -> onBackPressed()
     }
@@ -581,7 +594,6 @@ override fun onEditTextChangeListener(rootView: View, text: String, colorCode: I
         val intent = Intent()
         intent.putExtra("path", file.absolutePath)
         setResult(ResponseCode.RESULT_OK, intent)
-        // MODIFIED: Call the exit animation function instead of finishing directly
         animateFabOutAndFinish()
       } catch (e: Exception) {
         hideLoading()
@@ -630,28 +642,28 @@ override fun onEditTextChangeListener(rootView: View, text: String, colorCode: I
   private fun onCancel() {
     val intent = Intent()
     setResult(ResponseCode.RESULT_CANCELED, intent)
-    // MODIFIED: Call the exit animation function instead of finishing directly
     animateFabOutAndFinish()
   }
 
   private fun animateFabOutAndFinish() {
-    // Animate the FAB up and out of the screen
     mFabMoreOptions?.animate()
-      ?.translationY(-250f) // Move up and off-screen
-      ?.alpha(0f) // Fade it out
-      ?.setInterpolator(DecelerateInterpolator()) // A smooth exit
-      ?.setDuration(300) // A quick exit
+      ?.translationY(-250f)
+      ?.alpha(0f)
+      ?.setInterpolator(DecelerateInterpolator())
+      ?.setDuration(300)
       ?.withEndAction {
-        // This code runs ONLY after the animation is complete
         finish()
-        // Apply the fade-out transition for the whole activity
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
       }
       ?.start()
   }
 
   override fun onFilterSelected(photoFilter: PhotoFilter) {
+    if (!isUndoing) {
+        changesCounter++
+    }
     mPhotoEditor!!.setFilterEffect(photoFilter)
+    updateUndoButtonState()
   }
 
   private fun showBottomSheetDialogFragment(fragment: BottomSheetDialogFragment?) {
@@ -688,13 +700,8 @@ override fun onEditTextChangeListener(rootView: View, text: String, colorCode: I
     mConstraintSet.applyTo(mRootView)
   }
 
-  /**
-   * NEW: Helper function to animate the FAB in or out.
-   * @param show true to animate in, false to animate out
-   */
   private fun showFab(show: Boolean) {
       if (show) {
-          // Animate in
           mFabMoreOptions?.visibility = View.VISIBLE
           mFabMoreOptions?.animate()
               ?.alpha(1f)
@@ -703,7 +710,6 @@ override fun onEditTextChangeListener(rootView: View, text: String, colorCode: I
               ?.setDuration(200)
               ?.start()
       } else {
-          // Animate out
           mFabMoreOptions?.animate()
               ?.alpha(0f)
               ?.scaleX(0f)
@@ -716,7 +722,7 @@ override fun onEditTextChangeListener(rootView: View, text: String, colorCode: I
 
   private fun showShapes(isVisible: Boolean) {
     mIsShapePickerVisible = isVisible
-    showFab(!isVisible) // MODIFIED: Animate FAB based on picker visibility
+    showFab(!isVisible)
 
     val transition = Slide(Gravity.BOTTOM)
     transition.duration = 200
@@ -744,7 +750,7 @@ override fun onEditTextChangeListener(rootView: View, text: String, colorCode: I
       closeShapePickerAndDeselectTool()
     } else if (mIsFilterVisible) {
       showFilter(false)
-    } else if (!mPhotoEditor!!.isCacheEmpty) {
+    } else if (changesCounter > 0) {
       showSaveDialog()
     } else {
       onCancel()

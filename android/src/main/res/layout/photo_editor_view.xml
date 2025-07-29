@@ -28,7 +28,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- MODIFIED: Centered the title between the Undo and Done buttons -->
     <TextView
         android:id="@+id/txtTitle"
         android:layout_width="wrap_content"
@@ -41,7 +40,6 @@
         app:layout_constraintBottom_toTopOf="@+id/top_guideline"
         app:layout_constraintEnd_toStartOf="@+id/btnDone"
         app:layout_constraintStart_toEndOf="@+id/imgUndo"
-        app:layout_constraintHorizontal_bias="0.3" 
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -58,7 +56,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- MODIFIED: Added margin for spacing -->
     <ImageView
         android:id="@+id/imgUndo"
         android:layout_width="wrap_content"
@@ -96,12 +93,11 @@
         tools:listitem="@layout/color_picker_item_list"
         tools:visibility="visible" />
 
-    <!-- MODIFIED: Constrained the tools container to the FAB -->
+    <!-- MODIFIED: Centered the tools container -->
     <FrameLayout
         android:id="@+id/tools_container"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
         android:layout_marginBottom="9dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -149,25 +145,25 @@
         tools:listitem="@layout/row_filter_view" />
 
     <EditText
-    android:id="@+id/inlineEditText"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="16dp"
-    android:layout_marginEnd="16dp"
-    android:layout_marginBottom="8dp"
-    android:background="@android:color/transparent"
-    android:gravity="center"
-    android:imeOptions="actionDone"
-    android:inputType="text"
-    android:padding="8dp"
-    android:visibility="gone"
-    app:layout_constraintBottom_toTopOf="@+id/rvColorPicker"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    tools:text="Sample Text"
-    tools:textColor="@android:color/white"
-    tools:textSize="24sp"
-    tools:visibility="visible" />
+        android:id="@+id/inlineEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@android:color/transparent"
+        android:gravity="center"
+        android:imeOptions="actionDone"
+        android:inputType="text"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/rvColorPicker"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="Sample Text"
+        tools:textColor="@android:color/white"
+        tools:textSize="24sp"
+        tools:visibility="visible" />
 
     <FrameLayout
         android:id="@+id/fabMoreOptions"
@@ -178,7 +174,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- ... (FAB content remains the same) ... -->
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
