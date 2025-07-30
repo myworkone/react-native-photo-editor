@@ -92,6 +92,7 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
   // Self-managed state for the undo button
   private var changesCounter = 0
   private var isUndoing = false
+  private var mIsBrushColorInitialized = false
 
   private val cropImageLauncher = registerForActivityResult(CropImageContract()) { result ->
     if (result.isSuccessful) {
@@ -327,7 +328,7 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
     updateColorPickerVisibility()
   }
 
-  override fun onToolSelected(toolType: ToolType) {
+ override fun onToolSelected(toolType: ToolType) {
     if (mEditingTextView != null) commitInlineTextEdit()
 
     mPhotoEditor?.clearHelperBox()
@@ -339,21 +340,27 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
     mPhotoEditor!!.setBrushDrawingMode(mIsBrushMode)
 
     when (toolType) {
-      ToolType.CROP -> launchCrop()
-      ToolType.SHAPE -> showShapes(true)
-      ToolType.TEXT -> {
-        val styleBuilder = TextStyleBuilder()
-        styleBuilder.withTextColor(Color.WHITE)
-        styleBuilder.withTextSize(40f)
-        mPhotoEditor!!.addText("text", styleBuilder)
-      }
-      ToolType.ERASER -> mPhotoEditor!!.brushEraser()
-      ToolType.FILTER -> showFilter(true)
-      ToolType.STICKER -> showBottomSheetDialogFragment(mStickerFragment)
-      else -> { /* Do nothing */ }
+        ToolType.BRUSH -> {
+            if (!mIsBrushColorInitialized) {
+                mPhotoEditor!!.brushColor = Color.WHITE
+                mIsBrushColorInitialized = true
+            }
+        }
+        ToolType.CROP -> launchCrop()
+        ToolType.SHAPE -> showShapes(true)
+        ToolType.TEXT -> {
+            val styleBuilder = TextStyleBuilder()
+            styleBuilder.withTextColor(Color.WHITE)
+            styleBuilder.withTextSize(40f)
+            mPhotoEditor!!.addText("Text", styleBuilder)
+        }
+        ToolType.ERASER -> mPhotoEditor!!.brushEraser()
+        ToolType.FILTER -> showFilter(true)
+        ToolType.STICKER -> showBottomSheetDialogFragment(mStickerFragment)
+        else -> { /* Do nothing */ }
     }
     updateColorPickerVisibility()
-  }
+}
 
   override fun onStickerClick(bitmap: Bitmap) {
     if (mEditingTextView != null) commitInlineTextEdit()
