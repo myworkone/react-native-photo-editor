@@ -140,7 +140,7 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
   override fun onCreate(savedInstanceState: Bundle?) {
     overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     super.onCreate(savedInstanceState)
-    window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+    window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
     setContentView(R.layout.photo_editor_view)
     initViews()
 
