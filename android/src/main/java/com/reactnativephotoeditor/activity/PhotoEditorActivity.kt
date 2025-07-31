@@ -17,9 +17,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.LayoutInflater
 import android.view.Window
 import android.view.WindowManager
 import android.view.animation.AnticipateOvershootInterpolator
@@ -138,7 +138,6 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
   override fun onCreate(savedInstanceState: Bundle?) {
     overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     super.onCreate(savedInstanceState)
-    makeFullScreen()
     setContentView(R.layout.photo_editor_view)
     initViews()
 
