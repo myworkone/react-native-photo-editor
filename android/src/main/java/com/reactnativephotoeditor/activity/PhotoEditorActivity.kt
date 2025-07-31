@@ -65,6 +65,8 @@ import com.reactnativephotoeditor.activity.tools.ToolType
 import ja.burhanrashid52.photoeditor.*
 import java.io.File
 import java.io.FileOutputStream
+import android.view.Window
+import android.view.WindowManager
 
 open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, View.OnClickListener,
   PropertiesBSFragment.Properties, StickerListener,
@@ -138,6 +140,7 @@ open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, Vie
   override fun onCreate(savedInstanceState: Bundle?) {
     overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     super.onCreate(savedInstanceState)
+    window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
     setContentView(R.layout.photo_editor_view)
     initViews()
 
