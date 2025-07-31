@@ -65,8 +65,6 @@ import com.reactnativephotoeditor.activity.tools.ToolType
 import ja.burhanrashid52.photoeditor.*
 import java.io.File
 import java.io.FileOutputStream
-import android.view.Window
-import android.view.WindowManager
 
 open class PhotoEditorActivity : AppCompatActivity(), OnPhotoEditorListener, View.OnClickListener,
   PropertiesBSFragment.Properties, StickerListener,
